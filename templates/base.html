@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-bg: #f8f9fa;
+            --dark-text: #2c3e50;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color), #1a252f);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        
+        .nav-link {
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: var(--secondary-color) !important;
+            transform: translateY(-2px);
+        }
+        
+        .dashboard-card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: white;
+            overflow: hidden;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--secondary-color), #2980b9);
+            color: white;
+            font-weight: 600;
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+        }
+        
+        .welcome-section {
+            background: linear-gradient(rgba(44, 62, 80, 0.9), rgba(44, 62, 80, 0.9)), 
+                        url('{{ url_for("static", filename="images/hospital-bg.jpg") }}');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 5rem 0;
+            border-radius: 0 0 20px 20px;
+            margin-bottom: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
+                <i class="bi bi-hospital me-2"></i>
+                MediCare HMS
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    {% if current_user.is_authenticated %}
+                        {% if current_user.role in ['admin', 'doctor', 'nurse'] %}
+                            <li class="nav-item mx-1">
+                                <a class="nav-link d-flex align-items-center" href="{{ url_for('patient_dashboard') }}">
+                                    <i class="bi bi-people-fill me-1"></i>
+                                    Patients
+                                </a>
+                            </li>
+                        {% endif %}
+                        {% if current_user.role in ['admin', 'staff'] %}
+                            <li class="nav-item mx-1">
+                                <a class="nav-link d-flex align-items-center" href="{{ url_for('staff_dashboard') }}">
+                                    <i class="bi bi-person-lines-fill me-1"></i>
+                                    Staff
+                                </a>
+                            </li>
+                        {% endif %}
+                        {% if current_user.role in ['admin', 'finance'] %}
+                            <li class="nav-item mx-1">
+                                <a class="nav-link d-flex align-items-center" href="{{ url_for('financial_dashboard') }}">
+                                    <i class="bi bi-graph-up me-1"></i>
+                                    Finance
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% else %}
+                        <li class="nav-item mx-1">
+                            <a class="nav-link" href="{{ url_for('login') }}">Services</a>
+                        </li>
+                        <li class="nav-item mx-1">
+                            <a class="nav-link" href="#features">Features</a>
+                        </li>
+                        <li class="nav-item mx-1">
+                            <a class="nav-link" href="#contact">Contact</a>
+                        </li>
+                    {% endif %}
+                </ul>
+                <ul class="navbar-nav ms-auto">
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle me-1"></i>
+                                {{ current_user.username }} ({{ current_user.role }})
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Profile</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Settings</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="btn btn-outline-light me-2" href="{{ url_for('login') }}">
+                                <i class="bi bi-box-arrow-in-right"></i> Login
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-primary me-2" href="{{ url_for('register') }}">
+                                <i class="bi bi-person-plus"></i> Register
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid p-0">
+        {% if not current_user.is_authenticated %}
+        <!-- Welcome Section for Public Users -->
+        <section class="welcome-section text-center">
+            <div class="container">
+                <h1 class="display-4 fw-bold mb-4">Advanced Hospital Management System</h1>
+                <p class="lead mb-5">Streamlining healthcare operations for better patient care and efficient administration</p>
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg px-4">
+                        <i class="bi bi-box-arrow-in-right me-2"></i> Staff Login
+                    </a>
+                    <a href="#features" class="btn btn-outline-light btn-lg px-4">
+                        <i class="bi bi-list-check me-2"></i> Explore Features
+                    </a>
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        <div class="container my-5">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            <i class="bi {% if category == 'success' %}bi-check-circle-fill{% else %}bi-exclamation-triangle-fill{% endif %} me-2"></i>
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </div>
+
+        {% if not current_user.is_authenticated %}
+        <!-- Features Section -->
+        <section id="features" class="py-5 bg-white">
+            <div class="container">
+                <div class="text-center mb-5">
+                    <h2 class="fw-bold">Comprehensive Hospital Management</h2>
+                    <p class="lead text-muted">All the tools you need in one integrated platform</p>
+                </div>
+                
+                <div class="row g-4">
+                    <!-- Patient Management -->
+                    <div class="col-md-4">
+                        <div class="dashboard-card h-100">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="bi bi-people-fill me-2"></i>Patient Management</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="feature-icon">
+                                    <i class="bi bi-heart-pulse"></i>
+                                </div>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item border-0 ps-0">
+                                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                        Complete Electronic Health Records (EHR)
+                                    </li>
+                                    <li class="list-group-item border-0 ps-0">
+                                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                        Appointment scheduling with reminders
+                                    </li>
+                                    <li class="list-group-item border-0 ps-0">
+                                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                        Admission/Discharge automation
+                                    </li>
+                                    <li class="list-group-item border-0 ps-0">
+                                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                        Test results and communication system
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Staff Management -->
+                    <div class="col-md-4">
+                        <div class="dashboard-card h-100">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="bi bi-person-lines-fill me-2"></i>Staff Management</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="feature-icon">
+                                    <i class="bi bi-person-badge"></i>
+                                </div>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item border-0 ps-0">
+                                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                        Comprehensive staff roster
+                                    </li>
+                                    <li class="list-group-item border-0 ps-0">
+                                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                        Attendance tracking with reporting
+                                    </li>
+                                    <li class="list-group-item border-0 ps-0">
+                                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                        Departmental workload monitoring
+                                    </li>
+                                    <li class="list-group-item border-0 ps-0">
+                                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                        Shift management and notifications
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Financial Management -->
+                    <div class="col-md-4">
+                        <div class="dashboard-card h-100">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="bi bi-graph-up me-2"></i>Financial Management</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="feature-icon">
+                                    <i class="bi bi-cash-stack"></i>
+                                </div>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item border-0 ps-0">
+                                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                        Complete billing and invoicing
+                                    </li>
+                                    <li class="list-group-item border-0 ps-0">
+                                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                        Insurance claims tracking
+                                    </li>
+                                    <li class="list-group-item border-0 ps-0">
+                                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                        Revenue analytics and trends
+                                    </li>
+                                    <li class="list-group-item border-0 ps-0">
+                                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                        Payment alerts and reminders
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="py-5 bg-light">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h2 class="fw-bold mb-4">Ready to Transform Your Hospital Management?</h2>
+                        <p class="lead">Contact our team to schedule a demo or learn more about our solutions.</p>
+                        <div class="d-flex gap-3 mt-4">
+                            <a href="#" class="btn btn-primary px-4">
+                                <i class="bi bi-telephone-fill me-2"></i> Call Us
+                            </a>
+                            <a href="#" class="btn btn-outline-secondary px-4">
+                                <i class="bi bi-envelope-fill me-2"></i> Email Us
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <img src="{{ url_for('static', filename='images/medical-team.svg') }}" alt="Medical Team" class="img-fluid">
+                    </div>
+                </div>
+            </div>
+        </section>
+        {% endif %}
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5 class="mb-3">MediCare HMS</h5>
+                    <p>Comprehensive hospital management solution designed to streamline operations and improve patient care.</p>
+                </div>
+                <div class="col-md-2 mb-4 mb-md-0">
+                    <h5 class="mb-3">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="{{ url_for('index') }}" class="text-white text-decoration-none">Home</a></li>
+                        <li class="mb-2"><a href="#features" class="text-white text-decoration-none">Features</a></li>
+                        <li class="mb-2"><a href="#contact" class="text-white text-decoration-none">Contact</a></li>
+                        <li class="mb-2"><a href="{{ url_for('login') }}" class="text-white text-decoration-none">Login</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3 mb-4 mb-md-0">
+                    <h5 class="mb-3">Contact Info</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="bi bi-geo-alt-fill me-2"></i> 123 Medical Drive, Healthcare City</li>
+                        <li class="mb-2"><i class="bi bi-telephone-fill me-2"></i> (123) 456-7890</li>
+                        <li class="mb-2"><i class="bi bi-envelope-fill me-2"></i> info@medicarehms.com</li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5 class="mb-3">Follow Us</h5>
+                    <div class="d-flex gap-3">
+                        <a href="#" class="text-white"><i class="bi bi-facebook fs-4"></i></a>
+                        <a href="#" class="text-white"><i class="bi bi-twitter fs-4"></i></a>
+                        <a href="#" class="text-white"><i class="bi bi-linkedin fs-4"></i></a>
+                        <a href="#" class="text-white"><i class="bi bi-instagram fs-4"></i></a>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="text-center">
+                <p class="mb-0">&copy; 2023 MediCare Hospital Management System. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,103 @@
+    {% extends "base.html" %}
+
+    {% block content %}
+    <div class="container mt-4">
+        <h2 class="mb-4">Staff Dashboard</h2>
+
+        <div class="row">
+            <!-- Department Overview -->
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Department Overview</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Department</th>
+                                    <th>Staff Count</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for department, staff_count in departments %}
+                                <tr>
+                                    <td>{{ department }}</td>
+                                    <td>{{ staff_count }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attendance List -->
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Mark Attendance</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Staff</th>
+                                    <th>Check In</th>
+                                    <th>Check Out</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in attendance %}
+                                <tr>
+                                    <td>{{ record.staff.username }}</td>
+                                    <td>{{ record.check_in.strftime('%H:%M') if record.check_in else '-' }}</td>
+                                    <td>{{ record.check_out.strftime('%H:%M') if record.check_out else '-' }}</td>
+                                    <td>
+                                        <span class="badge bg-{% if record.status == 'Present' %}success{% elif record.status == 'Absent' %}danger{% elif record.status == 'Late' %}warning{% else %}info{% endif %}">
+                                            {{ record.status or 'Unknown' }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if not record.check_in %}
+                                        <form action="{{ url_for('mark_attendance') }}" method="POST">
+                                            <input type="hidden" name="staff_id" value="{{ record.staff.id }}">
+                                            <button type="submit" name="action" value="check_in" class="btn btn-success btn-sm">Check In</button>
+                                        </form>
+                                        {% elif not record.check_out %}
+                                        <form action="{{ url_for('mark_attendance') }}" method="POST">
+                                            <input type="hidden" name="staff_id" value="{{ record.staff.id }}">
+                                            <button type="submit" name="action" value="check_out" class="btn btn-danger btn-sm">Check Out</button>
+                                        </form>
+                                        {% else %}
+                                        <button class="btn btn-secondary btn-sm" disabled>Completed</button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shift Changes -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Shift Changes</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            No upcoming shift changes for today.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endblock %}

@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2>Financial Dashboard</h2>
+        
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Recent Bills</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Bill ID</th>
+                                    <th>Patient</th>
+                                    <th>Amount</th>
+                                    <th>Issued</th>
+                                    <th>Due</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for bill in bills %}
+                                <tr>
+                                    <td>{{ bill.id }}</td>
+                                    <td>{{ bill.patient.last_name }}, {{ bill.patient.first_name }}</td>
+                                    <td>${{ "%.2f"|format(bill.amount) }}</td>
+                                    <td>{{ bill.date_issued.strftime('%Y-%m-%d') }}</td>
+                                    <td>{{ bill.due_date.strftime('%Y-%m-%d') }}</td>
+                                    <td>
+                                        <span class="badge bg-{% if bill.status == 'Paid' %}success{% elif bill.status == 'Overdue' %}danger{% else %}warning{% endif %}">
+                                            {{ bill.status }}
+                                        </span>
+                                        {% if bill.insurance_claim %}
+                                            <span class="badge bg-info">Insurance</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="#" class="btn btn-info btn-sm">View</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Monthly Revenue</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="revenueChart" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Payment Status</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="paymentChart" height="200"></canvas>
+                        <table class="table mt-3">
+                            {% for status in status_summary %}
+                            <tr>
+                                <td>{{ status[0] }}</td>
+                                <td>{{ status[1] }} bills</td>
+                                <td>${{ "%.2f"|format(status[2] or 0) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Insurance Claims</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="claimsChart" height="200"></canvas>
+                        <table class="table mt-3">
+                            {% for claim in claims_summary %}
+                            <tr>
+                                <td>{{ claim[0] or 'Not Submitted' }}</td>
+                                <td>{{ claim[1] }} claims</td>
+                                <td>${{ "%.2f"|format(claim[2] or 0) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+<!-- 
+{% block scripts %}
+<script>
+    // Payment Status Chart
+    const paymentCtx = document.getElementById('paymentChart').getContext('2d');
+    const paymentChart = new Chart(paymentCtx, {
+        type: 'doughnut',
+        data: {
+            labels: [
+                {% for status in status_summary %}
+                    '{{ status[0] }}',
+                {% endfor %}
+            ],
+            datasets: [{
+                data: [
+                    {% for status in status_summary %}
+                        {{ status[1] }},
+                    {% endfor %}
+                ],
+                backgroundColor: [
+                    '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b'
+                ]
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+    
+    // Insurance Claims Chart
+    const claimsCtx = document.getElementById('claimsChart').getContext('2d');
+    const claimsChart = new Chart(claimsCtx, {
+        type: 'doughnut',
+        data: {
+            labels: [
+                {% for claim in claims_summary %}
+                    '{{ claim[0] or "Not Submitted" }}',
+                {% endfor %}
+            ],
+            datasets: [{
+                data: [
+                    {% for claim in claims_summary %}
+                        {{ claim[1] }},
+                    {% endfor %}
+                ],
+                backgroundColor: [
+                    '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b'
+                ]
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+    
+    // Revenue Chart
+    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+    const revenueChart = new Chart(revenueCtx, {
+        type: 'line',
+        data: {
+            labels: [
+                {% for month in monthly_revenue %}
+                    '{{ month[0] }}',
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Revenue',
+                data: [
+                    {% for month in monthly_revenue %}
+                        {{ month[1] }},
+                    {% endfor %}
+                ],
+                backgroundColor: 'rgba(78, 115, 223, 0.05)',
+                borderColor: 'rgba(78, 115, 223, 1)',
+                pointBackgroundColor: 'rgba(78, 115, 223, 1)',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: 'rgba(78, 115, 223, 1)'
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + value;
+                        }
+                    }
+                }
+            }
+        }
+    }); -->
+</script>
+{% endblock %}

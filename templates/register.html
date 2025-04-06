@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - MediCare HMS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-bg: #f8f9fa;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--light-bg);
+            background: linear-gradient(rgba(44, 62, 80, 0.05), rgba(44, 62, 80, 0.05)), 
+                      url('{{ url_for("static", filename="images/medical-bg.jpg") }}');
+            background-size: cover;
+            background-position: center;
+            min-height: 100vh;
+        }
+        
+        .register-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--secondary-color), #2980b9);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .form-control:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25);
+        }
+        
+        .btn-register {
+            background: linear-gradient(135deg, var(--primary-color), #1a252f);
+            border: none;
+            padding: 10px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-register:hover {
+            background: linear-gradient(135deg, #1a252f, var(--primary-color));
+        }
+        
+        .role-tabs {
+            display: flex;
+            border-bottom: 1px solid #dee2e6;
+            margin-bottom: 20px;
+        }
+        
+        .role-tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .role-tab.active {
+            border-bottom: 3px solid var(--secondary-color);
+            font-weight: 500;
+            color: var(--secondary-color);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-section {
+            margin-bottom: 20px;
+        }
+        
+        .form-section-title {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .input-group-text {
+            background-color: rgba(52, 152, 219, 0.1);
+            border-color: #dee2e6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center align-items-center" style="min-height: 100vh;">
+            <div class="col-lg-8 col-md-10">
+                <div class="register-card">
+                    <div class="card-header">
+                        <h3><i class="bi bi-hospital"></i> MediCare HMS Registration</h3>
+                        <p class="mb-0">Create your account</p>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="role-tabs">
+                            <div class="role-tab active" data-tab="staff">Staff Registration</div>
+                            <div class="role-tab" data-tab="patient">Patient Registration</div>
+                        </div>
+                        
+                        <form method="POST" action="{{ url_for('register') }}">
+                            <input type="hidden" name="role" id="role-input" value="staff">
+                            
+                            <!-- Common Fields -->
+                            <div class="form-section">
+                                <div class="form-section-title">
+                                    <i class="bi bi-person-circle"></i> Basic Information
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="first-name" class="form-label">First Name</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                            <input type="text" class="form-control" id="first-name" name="first_name" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="last-name" class="form-label">Last Name</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                            <input type="text" class="form-control" id="last-name" name="last_name" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="email" class="form-label">Email Address</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                            <input type="email" class="form-control" id="email" name="email" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="phone" class="form-label">Phone Number</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                                            <input type="tel" class="form-control" id="phone" name="phone" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="dob" class="form-label">Date of Birth</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+                                            <input type="date" class="form-control" id="dob" name="dob" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="gender" class="form-label">Gender</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-gender-ambiguous"></i></span>
+                                            <select class="form-select" id="gender" name="gender" required>
+                                                <option value="">Select Gender</option>
+                                                <option value="male">Male</option>
+                                                <option value="female">Female</option>
+                                                <option value="other">Other</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Staff Specific Fields -->
+                            <div class="tab-content active" id="staff-fields">
+                                <div class="form-section">
+                                    <div class="form-section-title">
+                                        <i class="bi bi-briefcase"></i> Professional Information
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="staff-id" class="form-label">Staff ID</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
+                                                <input type="text" class="form-control" id="staff-id" name="staff_id">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="department" class="form-label">Department</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="bi bi-building"></i></span>
+                                                <select class="form-select" id="department" name="department">
+                                                    <option value="">Select Department</option>
+                                                    <option value="emergency">Emergency</option>
+                                                    <option value="cardiology">Cardiology</option>
+                                                    <option value="neurology">Neurology</option>
+                                                    <option value="pediatrics">Pediatrics</option>
+                                                    <option value="administration">Administration</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="position" class="form-label">Position</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="bi bi-person-lines-fill"></i></span>
+                                                <select class="form-select" id="position" name="position">
+                                                    <option value="">Select Position</option>
+                                                    <option value="doctor">Doctor</option>
+                                                    <option value="nurse">Nurse</option>
+                                                    <option value="administrator">Administrator</option>
+                                                    <option value="technician">Technician</option>
+                                                    <option value="receptionist">Receptionist</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="qualification" class="form-label">Qualification</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="bi bi-award"></i></span>
+                                                <input type="text" class="form-control" id="qualification" name="qualification">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Patient Specific Fields -->
+                            <div class="tab-content" id="patient-fields">
+                                <div class="form-section">
+                                    <div class="form-section-title">
+                                        <i class="bi bi-heart-pulse"></i> Medical Information
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="blood-group" class="form-label">Blood Group</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="bi bi-droplet"></i></span>
+                                                <select class="form-select" id="blood-group" name="blood_group">
+                                                    <option value="">Select Blood Group</option>
+                                                    <option value="A+">A+</option>
+                                                    <option value="A-">A-</option>
+                                                    <option value="B+">B+</option>
+                                                    <option value="B-">B-</option>
+                                                    <option value="AB+">AB+</option>
+                                                    <option value="AB-">AB-</option>
+                                                    <option value="O+">O+</option>
+                                                    <option value="O-">O-</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="height" class="form-label">Height (cm)</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="bi bi-arrow-up"></i></span>
+                                                <input type="number" class="form-control" id="height" name="height">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="weight" class="form-label">Weight (kg)</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="bi bi-speedometer2"></i></span>
+                                                <input type="number" class="form-control" id="weight" name="weight">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="allergies" class="form-label">Allergies</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="bi bi-exclamation-triangle"></i></span>
+                                                <input type="text" class="form-control" id="allergies" name="allergies" placeholder="List any allergies">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="medical-history" class="form-label">Medical History</label>
+                                        <textarea class="form-control" id="medical-history" name="medical_history" rows="2" placeholder="Any previous medical conditions"></textarea>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-section">
+                                    <div class="form-section-title">
+                                        <i class="bi bi-geo-alt"></i> Address Information
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="address" class="form-label">Street Address</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-house-door"></i></span>
+                                            <input type="text" class="form-control" id="address" name="address">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label for="city" class="form-label">City</label>
+                                            <input type="text" class="form-control" id="city" name="city">
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="state" class="form-label">State</label>
+                                            <input type="text" class="form-control" id="state" name="state">
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="zip" class="form-label">ZIP Code</label>
+                                            <input type="text" class="form-control" id="zip" name="zip">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Account Credentials -->
+                            <div class="form-section">
+                                <div class="form-section-title">
+                                    <i class="bi bi-shield-lock"></i> Account Credentials
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="username" class="form-label">Username</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                            <input type="text" class="form-control" id="username" name="username" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="password" class="form-label">Password</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                                            <input type="password" class="form-control" id="password" name="password" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="confirm-password" class="form-label">Confirm Password</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                                            <input type="password" class="form-control" id="confirm-password" name="confirm_password" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-register">
+                                    <i class="bi bi-person-plus"></i> Register
+                                </button>
+                            </div>
+                            
+                            <div class="text-center mt-3">
+                                <p>Already have an account? <a href="{{ url_for('login') }}" class="text-decoration-none">Login here</a></p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Tab switching functionality
+        document.querySelectorAll('.role-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Update active tab
+                document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // Update hidden role input
+                const role = tab.getAttribute('data-tab');
+                document.getElementById('role-input').value = role;
+                
+                // Show corresponding fields
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.getElementById(`${role}-fields`).classList.add('active');
+            });
+        });
+        
+        // Password confirmation validation
+        const password = document.getElementById('password');
+        const confirmPassword = document.getElementById('confirm-password');
+        
+        function validatePassword() {
+            if (password.value !== confirmPassword.value) {
+                confirmPassword.setCustomValidity("Passwords don't match");
+            } else {
+                confirmPassword.setCustomValidity('');
+            }
+        }
+        
+        password.onchange = validatePassword;
+        confirmPassword.onkeyup = validatePassword;
+    </script>
+</body>
+</html>
