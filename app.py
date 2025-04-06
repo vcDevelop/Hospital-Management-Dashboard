@@ -208,6 +208,10 @@ def delete_appointment():
     flash("Appointment deleted successfully!", "success")
     return redirect(url_for("patient_dashboard"))
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('public/404.html'), 404
+
 # Appointment Booking
 @app.route('/add_appointment', methods=['POST'])
 @login_required
